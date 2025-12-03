@@ -1,0 +1,498 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - MTU Chess Club</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+         {% comment %} radial gradient background red nd blue{% endcomment %}
+            background: radial-gradient(circle at top left, #0047AB, #DC143C);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .auth-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            max-width: 1000px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .auth-left {
+            background: linear-gradient(135deg, #0047AB 0%, #003d82 100%);
+            color: white;
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .mtu-logo {
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            font-size: 3rem;
+            font-weight: bold;
+            color: #0047AB;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .auth-left h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .auth-left p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .auth-left .tagline {
+            font-size: 0.95rem;
+            opacity: 0.8;
+            font-style: italic;
+            margin-top: 20px;
+        }
+
+        .auth-right {
+            padding: 40px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .auth-header h2 {
+            color: #0047AB;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .auth-header p {
+            color: #666;
+        }
+
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #f0f0f0;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 15px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #666;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #0047AB, #003d82);
+            color: white;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #0047AB;
+            box-shadow: 0 0 0 3px rgba(0, 71, 171, 0.1);
+        }
+
+        .form-group small {
+            display: block;
+            margin-top: 5px;
+            color: #666;
+            font-size: 0.85rem;
+        }
+
+        .form-group small.error {
+            color: #DC143C;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #0047AB 0%, #003d82 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 71, 171, 0.3);
+        }
+
+        .guest-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .guest-link a {
+            color: #0047AB;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .guest-link a:hover {
+            text-decoration: underline;
+            color: #DC143C;
+        }
+
+        .messages {
+            margin-bottom: 20px;
+        }
+
+        .message {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .message.error {
+            background: #fee;
+            color: #DC143C;
+            border-left: 4px solid #DC143C;
+        }
+
+        .message.success {
+            background: #efe;
+            color: #28a745;
+            border-left: 4px solid #28a745;
+        }
+
+        .input-valid {
+            border-color: #28a745 !important;
+        }
+
+        .input-invalid {
+            border-color: #DC143C !important;
+        }
+
+        @media (max-width: 768px) {
+            .auth-container {
+                grid-template-columns: 1fr;
+            }
+
+            .auth-left {
+                display: none;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <!-- LEFT PANEL -->
+        <div class="auth-left">
+            <div class="mtu-logo">MTU</div>
+            <h1>MTU Chess Club</h1>
+            <p>Mountain Top University</p>
+            <p>Ibafo, Ogun State</p>
+            
+            <div class="tagline">
+                "Excellence in Mind & Move"
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL -->
+        <div class="auth-right">
+            <div class="auth-header">
+                <h2>Create Account</h2>
+                <p>Join the MTU Chess community</p>
+            </div>
+
+            <!-- MESSAGES -->
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="message {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- TAB BUTTONS -->
+            <div class="tab-buttons">
+                <button class="tab-btn" onclick="window.location.href='{% url 'login' %}'">Login</button>
+                <button class="tab-btn active">Register</button>
+            </div>
+
+            <!-- REGISTRATION FORM -->
+            <form method="POST" id="registerForm">
+                {% csrf_token %}
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="first_name">First Name</label>
+                        <input type="text" id="first_name" name="first_name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="last_name">Last Name</label>
+                        <input type="text" id="last_name" name="last_name" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required>
+                    <small>Choose a unique username</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="matric_number">Matric Number</label>
+                    <input type="text" 
+                           id="matric_number" 
+                           name="matric_number" 
+                           placeholder="23010301040 or F2301040"
+                           required
+                           maxlength="11">
+                    <small id="matricHelp">
+                        Regular: 11 digits (e.g., 23010301040)<br>
+                        Foundation: Letter + 7 digits (e.g., F2301040)
+                    </small>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="department">Department</label>
+                        <select id="department" name="department" required>
+                            <option value="">Select Department</option>
+                            <option value="CSC">Computer Science</option>
+                            <option value="MCM">Mass Communication</option>
+                            <option value="NUR">Nursing Science</option>
+                            <option value="IT">Information Technology</option>
+                            <option value="EEE">Electrical Engineering</option>
+                            <option value="MCE">Mechanical Engineering</option>
+                            <option value="CVE">Civil Engineering</option>
+                            <option value="CHE">Chemical Engineering</option>
+                            <option value="MTH">Mathematics</option>
+                            <option value="PHY">Physics</option>
+                            <option value="CHM">Chemistry</option>
+                            <option value="BIO">Biology</option>
+                            <option value="OTHER">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="level">Level</label>
+                        <select id="level" name="level" required>
+                            <option value="">Select Level</option>
+                            <option value="50">Foundation</option>
+                            <option value="100">100 Level</option>
+                            <option value="200">200 Level</option>
+                            <option value="300">300 Level</option>
+                            <option value="400">400 Level</option>
+                            <option value="500">500 Level</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                    <small>Use your MTU email if available</small>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" 
+                               required minlength="8">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password2">Confirm Password</label>
+                        <input type="password" id="password2" name="password2" 
+                               required minlength="8">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit">Create Account</button>
+            </form>
+
+            <div class="guest-link">
+                Already have an account? <a href="{% url 'login' %}">Login here</a><br>
+                Or <a href="{% url 'guest_mode' %}">Continue as Guest</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Real-time matric number validation
+        const matricInput = document.getElementById('matric_number');
+        const matricHelp = document.getElementById('matricHelp');
+        
+        matricInput.addEventListener('input', function(e) {
+            let value = this.value.toUpperCase();
+            this.value = value;
+            
+            // Regular pattern: 11 digits OR 1 letter + 7 digits
+            const regularPattern = /^\d{11}$/;
+            const foundationPattern = /^[A-Z]\d{7}$/;
+            
+            if (regularPattern.test(value) || foundationPattern.test(value)) {
+                this.classList.remove('input-invalid');
+                this.classList.add('input-valid');
+                matricHelp.classList.remove('error');
+                matricHelp.innerHTML = '✓ Valid matric number';
+                matricHelp.style.color = '#28a745';
+            } else if (value.length > 0) {
+                this.classList.remove('input-valid');
+                this.classList.add('input-invalid');
+                matricHelp.classList.add('error');
+                
+                if (value.length === 8 && /^[A-Z]/.test(value)) {
+                    matricHelp.innerHTML = '✓ Foundation matric format detected';
+                    matricHelp.style.color = '#28a745';
+                    this.classList.remove('input-invalid');
+                    this.classList.add('input-valid');
+                } else if (value.length < 8 && /^[A-Z]/.test(value)) {
+                    matricHelp.innerHTML = 'Foundation: Need ' + (8 - value.length) + ' more digits';
+                } else if (value.length < 11) {
+                    matricHelp.innerHTML = 'Regular: Need ' + (11 - value.length) + ' more digits';
+                } else {
+                    matricHelp.innerHTML = '✗ Invalid format';
+                }
+            } else {
+                this.classList.remove('input-valid', 'input-invalid');
+                matricHelp.classList.remove('error');
+                matricHelp.innerHTML = 'Regular: 11 digits (e.g., 23010301040)<br>Foundation: Letter + 7 digits (e.g., F2301040)';
+                matricHelp.style.color = '#666';
+            }
+        });
+
+        // Form validation
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            const password = document.getElementById('password').value;
+            const password2 = document.getElementById('password2').value;
+            const matricNumber = document.getElementById('matric_number').value;
+            
+            // Validate passwords match
+            if (password !== password2) {
+                e.preventDefault();
+                alert('Passwords do not match!');
+                return false;
+            }
+            
+            // Validate password length
+            if (password.length < 8) {
+                e.preventDefault();
+                alert('Password must be at least 8 characters long!');
+                return false;
+            }
+            
+            // Validate matric number
+            const regularPattern = /^\d{11}$/;
+            const foundationPattern = /^[A-Z]\d{7}$/;
+            
+            if (!regularPattern.test(matricNumber) && !foundationPattern.test(matricNumber)) {
+                e.preventDefault();
+                alert('Invalid matric number format!\n\nAccepted formats:\n- 11 digits (e.g., 23010301040)\n- 1 letter + 7 digits for Foundation (e.g., F2301040)');
+                return false;
+            }
+        });
+
+        // Password strength indicator
+        const passwordInput = document.getElementById('password');
+        passwordInput.addEventListener('input', function() {
+            const strength = calculatePasswordStrength(this.value);
+            // You can add visual feedback here
+        });
+
+        function calculatePasswordStrength(password) {
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (password.length >= 12) strength++;
+            if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+            if (/\d/.test(password)) strength++;
+            if (/[^a-zA-Z\d]/.test(password)) strength++;
+            return strength;
+        }
+    </script>
+</body>
+</html>

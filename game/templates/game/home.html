@@ -1,0 +1,196 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>MTU Chess Club - Home</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, {{ MTU_CHESS_CONFIG.SECONDARY_COLOR }} 0%, {{ MTU_CHESS_CONFIG.PRIMARY_COLOR }} 50%, {{ MTU_CHESS_CONFIG.SECONDARY_COLOR }} 100%);
+            min-height: 100vh;
+        }
+        
+        /* Hero Section */
+        .hero {
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            padding: 40px 20px;
+        }
+        
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .hero p {
+            font-size: 1.5rem;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .btn {
+            padding: 18px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+        
+       
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 3px solid white;
+            
+        }
+        
+        .btn-secondary:hover {
+            background: white;
+            color: #004d00;
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(255,255,255,0.4);
+        }
+        
+        /* Stats Section */
+        .stats {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            padding: 60px 20px;
+        }
+        
+        .stats-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            text-align: center;
+            color: white;
+        }
+        
+        .stat-value {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        /* Features */
+        .features {
+            max-width: 1200px;
+            margin: 60px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .feature-card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .feature-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+        
+        .feature-card h3 {
+            color: #004d00;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+        
+        .feature-card p {
+            color: #666;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <!-- HERO -->
+    <div class="hero">
+        <h1>♔ MTU Chess Club ♔</h1>
+        
+        <p>Play. Compete. Improve.</p>
+        
+        <div class="cta-buttons">
+            <a href="{% url 'login' %}" class="btn btn-secondary">Login to Play</a>
+            <a href="{% url 'register' %}" class="btn btn-secondary">Register Now</a>
+            <a href="{% url 'guest_mode' %}" class="btn btn-secondary">Watch as Guest</a>
+        </div>
+    </div>
+    
+    <!-- STATS -->
+    <div class="stats">
+        <div class="stats-container">
+            <div>
+                <div class="stat-value">{{ total_users }}</div>
+                <div class="stat-label">Active Players</div>
+            </div>
+            <div>
+                <div class="stat-value">{{ total_games }}</div>
+                <div class="stat-label">Games Played</div>
+            </div>
+            <div>
+                <div class="stat-value">{{ active_games }}</div>
+                <div class="stat-label">Live Now</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- FEATURES -->
+    <div class="features">
+        <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>Real-Time Play</h3>
+            <p>Play chess instantly with MTU students. Fast, reliable, and fun!</p>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h3>Track Progress</h3>
+            <p>Monitor your stats, rating, and improvement over time.</p>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon">🏆</div>
+            <h3>Compete</h3>
+            <p>Join tournaments and climb the leaderboard!</p>
+        </div>
+    </div>
+</body>
+</html>

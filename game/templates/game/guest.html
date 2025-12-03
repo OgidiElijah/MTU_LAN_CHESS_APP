@@ -1,0 +1,66 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Guest Mode - MTU Chess</title>
+    <style>
+        /* Same styling as tournament.html */
+        body {
+            background: linear-gradient(135deg, #004d00 0%, #228B22 100%);
+            font-family: 'Segoe UI', sans-serif;
+        }
+        
+        .guest-notice {
+            background: #fff3cd;
+            color: #856404;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 20px auto;
+            max-width: 800px;
+        }
+        
+        .guest-notice h2 {
+            margin-bottom: 10px;
+        }
+        
+        .guest-notice p {
+            margin: 10px 0;
+        }
+        
+        .register-prompt {
+            margin-top: 15px;
+        }
+        
+        .register-prompt a {
+            background: #004d00;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="guest-notice">
+        <h2>👀 Guest Mode - Watch Only</h2>
+        <p>You're browsing as a guest. You can watch live games but cannot play.</p>
+        <div class="register-prompt">
+            Want to play? 
+            <a href="{% url 'register' %}">Register Now</a> or 
+            <a href="{% url 'login' %}">Login</a>
+        </div>
+    </div>
+    
+    <!-- Show list of active games to watch -->
+    <div class="games-list">
+        {% for game in active_games %}
+        <div class="game-card" onclick="window.location.href='/watch/{{ game.code }}/'">
+            <h3>{{ game.code }}</h3>
+            <p>{{ game.get_white_display_name }} vs {{ game.get_black_display_name }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
