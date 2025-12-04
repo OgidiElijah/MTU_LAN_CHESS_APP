@@ -181,19 +181,20 @@ def watch_game(request, code):
 
 
 def tournament(request):
-    """Tournament dashboard"""
-    games = Game.objects.all()[:50]
-    
-    # Filter by status
-    status_filter = request.GET.get('status', 'all')
-    if status_filter != 'all':
-        games = games.filter(status=status_filter)
-    
-    context = {
-        'games': games,
-        'status_filter': status_filter,
-    }
-    return render(request, 'game/tournament.html', context)
+    status = request.GET.get("status")
+
+    queryset = Game.objects.all()
+
+    if status in ["waiting", "active", "completed"]:
+        queryset = queryset.filter(status=status)
+
+    games = queryset.order_by("-updated_at")[:50]   # slice LAST
+
+    return render(request, "game/tournament.html", {
+        "games": games,
+        "active_status": status
+    })
+
 
 
 def leaderboard(request):
