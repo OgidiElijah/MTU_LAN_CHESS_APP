@@ -302,7 +302,7 @@
             </div>
 
             <!-- REGISTRATION FORM -->
-            <form method="POST" id="registerForm">
+            <form method="POST" id="registerForm" enctype="multipart/form-data">
                 {% csrf_token %}
                 
                 <div class="form-row">
@@ -392,6 +392,12 @@
                     </div>
                 </div>
 
+                <div class="form-group">
+                    <label for="avatar">Profile Picture</label>
+                    <input type="file" id="avatar" name="avatar" accept="image/*">
+                    <small>JPG, PNG or GIF (max 5MB)</small>
+                </div>
+                
                 <button type="submit" class="btn-submit">Create Account</button>
             </form>
 

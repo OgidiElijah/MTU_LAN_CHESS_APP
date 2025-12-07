@@ -9,14 +9,15 @@ urlpatterns = [
     path('tournament/', views.tournament, name='tournament'),
     path('leaderboard/', views.leaderboard, name='leaderboard'),
     path('watch/<str:code>/', views.watch_game, name='watch_game'),
-    
+    path('recent/', views.recent_view, name="recent game"),
+    path('live/', views.live_view, name='live'),
+
     # Authentication
     path('login/', views.login_view, name='login'),
     path('register/', views.register_view, name='register'),
     path('logout/', views.logout_view, name='logout'),
     path('guest/', views.guest_mode, name='guest_mode'),
-    
-    # API endpoints
+
     path('api/game/create/', views.api_create_game, name='api_create_game'),
     path('api/game/<str:code>/state/', views.api_game_state, name='api_game_state'),
     path('api/game/<str:code>/move/', views.api_game_move, name='api_game_move'),

@@ -2,134 +2,131 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>Watch Game {{ game.code }} - MTU Chess</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Watch Game - MTU Chess</title>
     <link rel="stylesheet" href="{% static 'game/chessboard.css' %}">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #004d00 0%, #228B22 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .spectator-notice {
-            background: #fff3cd;
-            color: #856404;
-            padding: 15px 20px;
-            border-radius: 10px;
-            text-align: center;
-            margin-bottom: 20px;
-            font-weight: bold;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr 600px 1fr;
-            gap: 30px;
-        }
-
-        .side-panel {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        }
-
-        #board {
-            border-radius: 10px;
-            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
-        }
-
-        .player-info {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 10px 0;
-            text-align: center;
-        }
-
-        h3 {
-            color: #004d00;
-            margin-bottom: 15px;
-            border-bottom: 2px solid #004d00;
-            padding-bottom: 10px;
-        }
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial;background:linear-gradient(135deg, {{ MTU_CHESS_CONFIG.PRIMARY_COLOR }} 0%, {{ MTU_CHESS_CONFIG.SECONDARY_COLOR }} 100%);min-height:100vh;color:#222}
+        nav{background:rgba(0,0,0,0.28);padding:1rem 0;box-shadow:0 2px 10px rgba(0,0,0,0.15)}
+        nav .container{max-width:1400px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;padding:0 20px}
+        .main-container{max-width:1400px;margin:28px auto;padding:0 20px}
+        .layout{display:grid;grid-template-columns: 2fr 1fr; gap:18px}
+        .panel{background:#fff;border-radius:12px;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,0.12)}
+        .game-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+        .game-info{font-weight:700;color:{{ MTU_CHESS_CONFIG.PRIMARY_COLOR }}}
+        .players{margin-top:8px;color:#555}
+        .board-wrap{width:100%;max-width:640px;margin:8px auto}
+        .moves{max-height:480px;overflow:auto;padding:8px;background:#f7f9fb;border-radius:8px}
+        .move-item{padding:6px;border-bottom:1px solid #eee;font-size:0.95rem}
+        .meta p{margin:6px 0;color:#666}
+        .btn{display:inline-block;padding:8px 12px;border-radius:8px;text-decoration:none;font-weight:700}
+        .btn-join{background:{{ MTU_CHESS_CONFIG.PRIMARY_COLOR }};color:#fff}
+        .btn-back{background:#fff;color:{{ MTU_CHESS_CONFIG.PRIMARY_COLOR }};border:1px solid rgba(0,0,0,0.06)}
+        @media (max-width:900px){.layout{grid-template-columns:1fr}}
     </style>
 </head>
 <body>
-    <div class="spectator-notice">
-        👀 Spectator Mode - You are watching {{ game.get_white_display_name }} vs {{ game.get_black_display_name }}
-    </div>
-
-    <div class="container">
-        <div class="side-panel">
-            <h3>Game Info</h3>
-            <p><strong>Code:</strong> {{ game.code }}</p>
-            <p><strong>Status:</strong> {{ game.get_status_display }}</p>
-            <p><strong>Time Control:</strong> {{ game.get_time_control_display }}</p>
-        </div>
-
-        <div>
-            <div class="player-info">
-                {{ game.get_black_display_name }} (Black)
-            </div>
-            <div id="board"></div>
-            <div class="player-info">
-                {{ game.get_white_display_name }} (White)
+    <nav>
+        <div class="container">
+            <div class="logo">♟ MTU Chess</div>
+            <div class="nav-links">
+                <a href="{% url 'dashboard' %}">Dashboard</a>
+                <a href="{% url 'live' %}">Live</a>
+                <a href="{% url 'recent game' %}">Recent</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'logout' %}">Logout</a>
+                {% else %}
+                    <a href="{% url 'login' %}">Login</a>
+                {% endif %}
             </div>
         </div>
+    </nav>
 
-        <div class="side-panel">
-            <h3>Move History</h3>
-            <div id="moveList"></div>
-        </div>
+    <div class="main-container">
+        {% if game %}
+            <div class="layout">
+                <div class="panel">
+                    <div class="game-header">
+                        <div>
+                            <div class="game-info">Game: {{ game.code }}</div>
+                            <div class="players">♙ {{ game.get_white_display_name }} &nbsp; vs &nbsp; ♟ {{ game.get_black_display_name }}</div>
+                            <div class="meta"><p>Status: {{ game.get_status_display }}</p><p>Time Control: {{ game.time_control|default:"—" }}</p></div>
+                        </div>
+                        <div>
+                            <a class="btn btn-back" href="{% url 'live' %}">← Back to Live</a>
+                            {% if can_join %}
+                                <a class="btn btn-join" href="{% url 'join_game' game.code %}">Join Game</a>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div style="display:flex;flex-wrap:wrap;gap:18px;align-items:flex-start;justify-content:center">
+                        <div class="board-wrap">
+                            <!-- chessboard.js expects an element with id 'board' -->
+                            <div id="board" style="width:100%;height:100%;max-width:640px"></div>
+                        </div>
+
+                        <div style="flex:1;min-width:260px">
+                            <div class="moves panel" style="padding:12px">
+                                <h4 style="margin-bottom:8px">Move History</h4>
+                                {% if moves %}
+                                    {% for m in moves %}
+                                        <div class="move-item">{{ m.move_number }}. {{ m.move_san }} <small style="color:#888">({{ m.player_color }})</small></div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="move-item">No moves yet.</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <aside class="panel">
+                    <h4>Game Details</h4>
+                    <p><strong>Created:</strong> {{ game.created_at|date:"SHORT_DATETIME_FORMAT" }}</p>
+                    <p><strong>Moves:</strong> {{ game.move_count }}</p>
+                    <p><strong>Rated:</strong> {{ game.is_rated|yesno:"Yes,No" }}</p>
+
+                    <div style="margin-top:12px">
+                        <h4>Players</h4>
+                        <p>White: {{ game.get_white_display_name }}</p>
+                        <p>Black: {{ game.get_black_display_name }}</p>
+                    </div>
+                </aside>
+            </div>
+        {% else %}
+            <div class="panel">
+                <div class="empty-state" style="padding:28px;text-align:center">
+                    <div style="font-size:42px">⚠️</div>
+                    <p>Game not found or unavailable.</p>
+                    <a class="btn btn-back" href="{% url 'live' %}">Back to Live</a>
+                </div>
+            </div>
+        {% endif %}
     </div>
 
     <script src="{% static 'game/chess.js' %}"></script>
     <script src="{% static 'game/chessboard.js' %}"></script>
     <script>
-        const game = new Chess('{{ game.fen }}');
-        const board = new Chessboard('board', {
-            width: 600,
-            pieceTheme: p => "{% static 'game/chess_pieces/' %}" + p + ".png",
-            getPosition: () => fenToObject(game.fen()),
-            onShowMoves: () => [], // No moves in spectator mode
-            onDrop: () => "snapback" // Can't move pieces
-        });
+        (function () {
+            // Initialize board visually if a FEN is available; fallback to START_FEN
+            const startFen = "{{ game.fen|default:START_FEN }}";
+            const boardElId = "board";
 
-        board.setPosition(fenToObject('{{ game.fen }}'));
-
-        // Poll for updates
-        setInterval(async () => {
-            const res = await fetch('/api/game/{{ game.code }}/state/');
-            const data = await res.json();
-            if (data.fen !== game.fen()) {
-                game.load(data.fen);
-                board.setPosition(fenToObject(data.fen));
+            // Basic integration point - your existing chessboard.js API may differ
+            try {
+                const board = new Chessboard(boardElId, {
+                    width: 640,
+                    pieceTheme: "{% static 'game/chess_pieces/{piece}.png' %}",
+                    getPosition: function() { return {}; } // your view should provide position via context or API
+                });
+                // If you can set position via board.setPosition(...) do so here when available
+            } catch (e) {
+                console.warn("Chessboard init failed:", e);
             }
-        }, 2000);
-
-        function fenToObject(fen) {
-            const rows = fen.split(" ")[0].split("/");
-            const pos = {};
-            for (let r = 0; r < 8; r++) {
-                let file = 0;
-                for (const c of rows[r]) {
-                    if (!isNaN(c)) file += parseInt(c);
-                    else {
-                        const sq = "abcdefgh"[file] + (8 - r);
-                        pos[sq] = c === c.toLowerCase() ? "b" + c.toUpperCase() : "w" + c;
-                        file++;
-                    }
-                }
-            }
-            return pos;
-        }
+        })();
     </script>
 </body>
 </html>

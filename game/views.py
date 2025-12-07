@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.contrib import messages
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -8,6 +9,7 @@ from django.views.decorators.http import require_http_methods
 from django.utils.crypto import get_random_string
 from django.utils import timezone
 from django.db.models import Q, Count
+from django.conf import settings
 import json
 
 from .models import User, Game, GameSession, Move, START_FEN
@@ -159,6 +161,41 @@ def guest_mode(request):
     return render(request, 'game/guest.html', context)
 
 
+@login_required
+def recent_view(request):
+    """
+    Page that shows the user's full recent games list (used by dashboard "View All").
+    """
+    # fetch user's games (either white or black) ordered newest first
+    user_games = Game.objects.filter(
+        Q(white_player=request.user) | Q(black_player=request.user)
+    ).order_by('-id')  # replace '-id' with '-updated_at' if your Game model has timestamp
+
+    # simple percentage for rating progress (0-100) based on MINIMUM_GAMES_FOR_RATING
+    min_games = getattr(settings, 'MTU_CHESS_CONFIG', {}).get('MINIMUM_GAMES_FOR_RATING', 5)
+    rating_progress = min(100, int((request.user.total_games / max(1, min_games)) * 100))
+
+    context = {
+        'user_games': user_games,
+        'rating_progress': rating_progress,
+    }
+    return render(request, 'game/recent.html', context)
+
+
+@login_required
+def live_view(request):
+    """
+    Show all active/live games. Clicking a game goes to the watch page.
+    """
+    # Adjust filter field if your Game model uses a different status field or flag
+    active_games = Game.objects.filter(status='active').order_by('-id')
+
+    context = {
+        'active_games': active_games,
+    }
+    return render(request, 'game/live.html', context)
+
+
 # ============================================
 # GAME VIEWS
 # ============================================
@@ -170,12 +207,25 @@ def play(request):
 
 
 def watch_game(request, code):
-    """Watch a game (for guests)"""
-    game = get_object_or_404(Game, code=code.upper())
+    """Watch a live game"""
+    game = get_object_or_404(Game, code=code)
+    
+    # Query moves correctly
+    moves = Move.objects.filter(game=game).order_by('move_number')
+    
+    # Check if user can join
+    is_participant = game.white_player == request.user or game.black_player == request.user
+    can_join = (request.user.is_authenticated and 
+                not is_participant and 
+                game.status == 'waiting' and
+                (game.white_player is None or game.black_player is None))
     
     context = {
         'game': game,
-        'is_spectator': True,
+        'moves': moves,
+        'is_participant': is_participant,
+        'can_join': can_join,
+        'START_FEN': START_FEN,  # Add this line
     }
     return render(request, 'game/watch.html', context)
 

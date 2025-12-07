@@ -323,6 +323,50 @@
             margin-bottom: 15px;
         }
 
+        .profile-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .profile-pic {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .avatar-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #004d00;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .profile-info h2 {
+            color: #004d00;
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .profile-info p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
         @media (max-width: 1024px) {
             .content-grid {
                 grid-template-columns: 1fr;
@@ -381,6 +425,22 @@
             </div>
         </div>
 
+        <!-- PROFILE SECTION -->
+        <div class="profile-section">
+            <div class="profile-pic">
+                {% if user.avatar %}
+                    <img src="{{ user.avatar.url }}" alt="{{ user.username }}" class="avatar-img">
+                {% else %}
+                    <div class="avatar-placeholder">{{ user.username|first|upper }}</div>
+                {% endif %}
+            </div>
+            <div class="profile-info">
+                <h2>{{ user.first_name }} {{ user.last_name }}</h2>
+                <p>@{{ user.username }}</p>
+                <p>{{ user.get_department_display }} • Level {{ user.level }}</p>
+            </div>
+        </div>
+
         <!-- STATS GRID -->
         <div class="stats-grid">
             <div class="stat-card">
@@ -421,12 +481,15 @@
             <div class="content-section">
                 <div class="section-header">
                     <h2>Your Recent Games</h2>
-                    <a href="{% url 'tournament' %}">View All →</a>
+                    {% if user_games %}
+                    <a href="{% url 'recent game' %}">View All →</a>
+                    {% endif %}
                 </div>
 
                 <div class="game-list">
                     {% if user_games %}
-                        {% for game in user_games %}
+                        {# show only 3 most recent here; link "View All" goes to recent page #}
+                        {% for game in user_games|slice:":3" %}
                         <div class="game-item">
                             <div class="game-info">
                                 <div class="game-code">{{ game.code }}</div>
@@ -452,46 +515,43 @@
             <div class="content-section">
                 <div class="section-header">
                     <h2>Live Games</h2>
-                    <a href="{% url 'tournament' %}">View More →</a>
+                    <a href="{% url 'live' %}">View More →</a>
                 </div>
-
-                <div class="watch-list">
+                
+                <div class="game-list">
                     {% if active_games %}
-                        {% for game in active_games %}
-                        <div class="watch-item" onclick="window.location.href='/watch/{{ game.code }}/'">
-                            <div class="watch-code">🔴 {{ game.code }}</div>
-                            <div class="watch-players">
-                                {{ game.get_white_display_name }} vs {{ game.get_black_display_name }}
+                        {% for g in active_games|slice:":3" %}
+                            <div class="game-item" onclick="window.location.href='{% url 'watch_game' g.code %}'" style="cursor:pointer;">
+                                <div class="game-info">
+                                    <div class="game-code">{{ g.code }}</div>
+                                    <div class="game-players">
+                                        ♙ {{ g.get_white_display_name }} vs ♟ {{ g.get_black_display_name }}
+                                    </div>
+                                </div>
+                                <div class="game-status status-active">Live</div>
                             </div>
-                        </div>
                         {% endfor %}
                     {% else %}
                         <div class="empty-state">
-                            <div class="empty-state-icon">👀</div>
-                            <p>No active games to watch</p>
+                            <div class="empty-state-icon">🔴</div>
+                            <p>No active games right now</p>
                         </div>
                     {% endif %}
                 </div>
             </div>
         </div>
 
-        <!-- Show user rating status -->
-        <p>Rating: {{ user.display_rating }}</p>
-
-        <!-- Show "Unrated" until 5 games -->
-        <!-- Output before 5 games: "Unrated (3 games needed)" -->
-        <!-- Output after 5 games: "1250" -->
-
-        {% if user.is_rated %}
-            <p>This player has been rated.</p>
-        {% else %}
-            <p>{{ user.total_games }}/5 games played</p>
-        {% endif %}
-
         <div class="rating-progress">
-            <p>Rating Progress: {{ user.total_games }}/5 games</p>
-            <div style="width: 100%; background: #ddd; border-radius: 5px; overflow: hidden;">
-                <div style="width: {{ rating_progress }}%; background: #4CAF50; height: 20px; transition: width 0.3s;"></div>
+                
+            {% if user.is_rated %}
+            {% else %}
+                <p>Rating: {{ user.display_rating }} </p>
+                <p>Rating Progress: {{ user.total_games }}/5 games played</p>
+                <div style="width: 100%; background: #ddd; border-radius: 5px; overflow: hidden;">
+                <div style="width: {{ rating_progress }}%; background: {{MTU_CHESS_CONFIG.PRIMARY_COLOR}}; height: 20px; transition: width 0.3s;"></div>
+           
+            {% endif %}
+            
             </div>
         </div>
     </div>

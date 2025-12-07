@@ -1,0 +1,73 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Live Games - MTU Chess Club</title>
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{
+            font-family:system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial;
+            background: linear-gradient(135deg, {{ MTU_CHESS_CONFIG.PRIMARY_COLOR }} 0%, {{ MTU_CHESS_CONFIG.SECONDARY_COLOR }} 100%);
+            color:#222; min-height:100vh;
+        }
+        nav{background:rgba(0,0,0,0.25);padding:1rem 0;box-shadow:0 2px 8px rgba(0,0,0,0.15)}
+        nav .container{max-width:1400px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;padding:0 20px}
+        nav a{color:#fff;text-decoration:none;margin-left:12px;font-weight:600}
+        .main-container{max-width:1400px;margin:28px auto;padding:0 20px}
+        .content-section{background:#fff;border-radius:12px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,0.12)}
+        .section-header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #eee;padding-bottom:12px;margin-bottom:16px}
+        .section-header h2{color:#004d00}
+        .game-list{display:flex;flex-direction:column;gap:12px}
+        .game-item{display:flex;justify-content:space-between;align-items:center;padding:14px;border-radius:10px;background:#f7f9fb;cursor:pointer;border-left:4px solid #004d00}
+        .game-code{font-family:monospace;font-weight:700;color:#004d00}
+        .game-players{color:#555}
+        .game-status{padding:6px 10px;border-radius:12px;font-weight:700}
+        .status-active{background:#d4edda;color:#155724}
+        .empty-state{padding:40px;text-align:center;color:#888}
+        @media (min-width:1000px){.layout{display:grid;grid-template-columns:2fr 1fr;gap:18px}}
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <div class="logo">♟ MTU Chess</div>
+            <div class="nav-links">
+                <a href="{% url 'dashboard' %}">Dashboard</a>
+                <a href="{% url 'play' %}">Play</a>
+                <a href="{% url 'leaderboard' %}">Leaderboard</a>
+                <a href="{% url 'logout' %}">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <div class="content-section">
+            <div class="section-header">
+                <h2>Live Games</h2>
+                <a href="{% url 'dashboard' %}">Back to Dashboard</a>
+            </div>
+
+            <div class="game-list">
+                {% if active_games %}
+                    {% for game in active_games %}
+                        <div class="game-item" onclick="window.location.href='{% url 'watch_game' game.code %}'">
+                            <div>
+                                <div class="game-code">{{ game.code }}</div>
+                                <div class="game-players">♙ {{ game.get_white_display_name }} vs ♟ {{ game.get_black_display_name }}</div>
+                            </div>
+                            <div class="game-status status-active">Live • {{ game.time_control|default:"—" }}</div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <div style="font-size:48px">🔴</div>
+                        <p>No active games right now. Create a game or check back soon.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

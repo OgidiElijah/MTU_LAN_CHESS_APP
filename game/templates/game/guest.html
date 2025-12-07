@@ -2,65 +2,83 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Guest Mode - MTU Chess</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Guest - MTU Chess</title>
     <style>
-        /* Same styling as tournament.html */
-        body {
-            background: linear-gradient(135deg, #004d00 0%, #228B22 100%);
-            font-family: 'Segoe UI', sans-serif;
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            background: linear-gradient(135deg, {{ MTU_CHESS_CONFIG.PRIMARY_COLOR }} 0%, {{ MTU_CHESS_CONFIG.SECONDARY_COLOR }} 100%);
+            color:#222; min-height:100vh;
         }
-        
-        .guest-notice {
-            background: #fff3cd;
-            color: #856404;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            margin: 20px auto;
-            max-width: 800px;
+        nav{
+            background: rgba(0,0,0,0.28);
+            padding:1rem 0;
+            box-shadow:0 2px 10px rgba(0,0,0,0.15);
         }
-        
-        .guest-notice h2 {
-            margin-bottom: 10px;
-        }
-        
-        .guest-notice p {
-            margin: 10px 0;
-        }
-        
-        .register-prompt {
-            margin-top: 15px;
-        }
-        
-        .register-prompt a {
-            background: #004d00;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: bold;
-        }
+        nav .container{max-width:1400px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;padding:0 20px}
+        .logo{color:#fff;font-weight:700}
+        .nav-links a{color:#fff;text-decoration:none;margin-left:12px;font-weight:600}
+        .main-container{max-width:1400px;margin:28px auto;padding:0 20px}
+        .content-section{background:#fff;border-radius:12px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,0.12)}
+        .guest-notice{background:#fff3cd;color:#856404;padding:18px;border-radius:10px;text-align:center;margin-bottom:18px}
+        .guest-actions a{display:inline-block;margin:8px 6px;padding:8px 14px;border-radius:8px;text-decoration:none;font-weight:700}
+        .btn-register{background:{{ MTU_CHESS_CONFIG.PRIMARY_COLOR }};color:#fff}
+        .btn-login{background:#fff;color:{{ MTU_CHESS_CONFIG.PRIMARY_COLOR }};border:1px solid rgba(0,0,0,0.06)}
+        .games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-top:12px}
+        .game-card{background:#f8f9fa;padding:14px;border-radius:10px;border-left:4px solid {{ MTU_CHESS_CONFIG.PRIMARY_COLOR }};cursor:pointer}
+        .game-code{font-weight:800;color:{{ MTU_CHESS_CONFIG.PRIMARY_COLOR }};font-family:monospace}
+        .game-meta{color:#666;margin-top:6px;font-size:0.95rem}
+        .empty-state{text-align:center;color:#888;padding:40px;border-radius:8px}
     </style>
 </head>
 <body>
-    <div class="guest-notice">
-        <h2>👀 Guest Mode - Watch Only</h2>
-        <p>You're browsing as a guest. You can watch live games but cannot play.</p>
-        <div class="register-prompt">
-            Want to play? 
-            <a href="{% url 'register' %}">Register Now</a> or 
-            <a href="{% url 'login' %}">Login</a>
+    <nav>
+        <div class="container">
+            <div class="logo">♟ MTU Chess</div>
+            <div class="nav-links">
+                <a href="{% url 'home' %}">Home</a>
+                <a href="{% url 'dashboard' %}">Dashboard</a>
+                <a href="{% url 'live' %}">Live</a>
+                <a href="{% url 'login' %}">Login</a>
+            </div>
         </div>
-    </div>
-    
-    <!-- Show list of active games to watch -->
-    <div class="games-list">
-        {% for game in active_games %}
-        <div class="game-card" onclick="window.location.href='/watch/{{ game.code }}/'">
-            <h3>{{ game.code }}</h3>
-            <p>{{ game.get_white_display_name }} vs {{ game.get_black_display_name }}</p>
+    </nav>
+
+    <div class="main-container">
+        <div class="content-section">
+            <div class="guest-notice">
+                <h2>👀 Guest Mode — Watch Only</h2>
+                <p>You are browsing as a guest. You can watch live games but you cannot play or join games.</p>
+                <div class="guest-actions">
+                    <a class="btn-register" href="{% url 'register' %}">Register</a>
+                    <a class="btn-login" href="{% url 'login' %}">Login</a>
+                </div>
+            </div>
+
+            <div>
+                <h3 style="margin-bottom:10px;color:#004d00">Active Games</h3>
+                {% if active_games %}
+                    <div class="games-grid">
+                        {% for game in active_games %}
+                            <div class="game-card" onclick="window.location.href='{% url 'watch_game' game.code %}'">
+                                <div class="game-code">{{ game.code }}</div>
+                                <div class="game-meta">♙ {{ game.get_white_display_name }} vs ♟ {{ game.get_black_display_name }}</div>
+                                <div style="margin-top:8px;font-size:0.85rem;color:#666">
+                                    Status: {{ game.get_status_display }} • {{ game.time_control|default:"—" }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <div style="font-size:42px">🔴</div>
+                        <p>No active games at the moment. Check back later.</p>
+                    </div>
+                {% endif %}
+            </div>
         </div>
-        {% endfor %}
     </div>
 </body>
 </html>
