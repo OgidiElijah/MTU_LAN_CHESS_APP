@@ -1,6 +1,16 @@
-# Environment variables (NEVER commit .env)
+# Environment variables (NEVER commit)
 .env
 .env.local
+.env.*.local
+
+# Database
+db.sqlite3
+db.sqlite3-journal
+*.db
+
+# User uploads
+media/
+avatars/
 
 # Python
 __pycache__/
@@ -27,14 +37,6 @@ wheels/
 .installed.cfg
 *.egg
 
-# Django
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-/media
-/staticfiles
-
 # IDE
 .vscode/
 .idea/
@@ -42,13 +44,13 @@ db.sqlite3-journal
 *.swo
 *~
 .DS_Store
-
-# OS
 Thumbs.db
-.DS_Store
-.env
-*.pyc
-__pycache__/
-db.sqlite3
-media/
-staticfiles/
+
+# Logs
+*.log
+local_settings.py
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
