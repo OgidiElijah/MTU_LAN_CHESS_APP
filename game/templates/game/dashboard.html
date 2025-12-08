@@ -425,21 +425,6 @@
             </div>
         </div>
 
-        <!-- PROFILE SECTION -->
-        <div class="profile-section">
-            <div class="profile-pic">
-                {% if user.avatar %}
-                    <img src="{{ user.avatar.url }}" alt="{{ user.username }}" class="avatar-img">
-                {% else %}
-                    <div class="avatar-placeholder">{{ user.username|first|upper }}</div>
-                {% endif %}
-            </div>
-            <div class="profile-info">
-                <h2>{{ user.first_name }} {{ user.last_name }}</h2>
-                <p>@{{ user.username }}</p>
-                <p>{{ user.get_department_display }} • Level {{ user.level }}</p>
-            </div>
-        </div>
 
         <!-- STATS GRID -->
         <div class="stats-grid">
